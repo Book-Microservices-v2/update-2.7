@@ -1,4 +1,6 @@
-# Book Extra Chapters - U.2.5: Upgrade to Spring Boot 2.5.5, JDK 17
+# Book Extra Chapters - U.2.6: Upgrade to Spring Boot 2.6.2, Spring Cloud 2021.0, and JDK 17
+
+Good news! The book contents are still good and everything in there applies to the newest releases. If you don't have it yet, [get it now!](https://amzn.to/3nADn4q)
 
 This repository contains the source code of the practical use case described in the book [Learn Microservices with Spring Boot (2nd Edition)](https://amzn.to/3nADn4q).
 
@@ -6,38 +8,50 @@ If you want to know more details about the book and its extra chapters, make sur
 
 The book follows a pragmatic approach to building a Microservice Architecture, using a reference implementation that evolves from a small monolith to a full microservice system. 
 
-## Upgrade - Spring Boot 2.5.5, JDK 17
+## Upgrade - Spring Boot 2.6.2, JDK 17
 
-This extra chapter brings the project dependencies to the latest Spring Boot and Java versions. 
+This extra chapter brings the project dependencies to the latest Spring Boot, Spring Cloud, and Java versions. 
 
-All these changes are described in detail in a [blog post](https://thepracticaldeveloper.com/book-update-2.5.5/) at The Practical Developer's website. Visit [https://thepracticaldeveloper.com/book-update-2.5.5/](https://thepracticaldeveloper.com/book-update-2.5.5/)
+All these changes are described in detail in a [blog post](https://thepracticaldeveloper.com/book-update-2.6.2/) at The Practical Developer's website. Visit [https://thepracticaldeveloper.com/book-update-2.6.2/](https://thepracticaldeveloper.com/book-update-2.6.2/)
 
-### Changes - migrating from Spring Boot 2.4.0 to 2.5.5
+### Changes - migrating from Spring Boot 2.5.5 to 2.6.2
 
-A summary of the updates included in this package:
+There are no additional changes needed in our codebase for this update apart from the version updates:
 
-* [Multiplication]: Changed the logic of `ChallengeGeneratorService` to use the new JDK 17's `RandomGenerator` interface. This fixes a test but also uses good testing practices (Mock over Spy).
-* [Gamification]: Removed the trick inside `application-default.properties` since that's not needed anymore and broke the build after the update.
+* All poms changed from 2.5.5 to 2.6.2
+* Spring Cloud version now points to 2021.0.0
+* Docker-compose file also points to the new generated images
 
-The full description is [here](https://thepracticaldeveloper.com/book-update-2.5.5/).
+#### Gateway: a minor remark
+
+After this update, I see a long stacktrace in the Gateway with a message as follows:
+
+```java
+i.n.r.d.DnsServerAddressStreamProviders  : Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS.
+...        
+Caused by: java.lang.UnsatisfiedLinkError: 'io.netty.resolver.dns.macos.DnsResolver[] io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider.resolvers()'
+```
+
+This is only relevant if you're running the project in MacOS. It seems this has been always there but its logging level was promoted and now we see it in the console. It doesn't have any impact on the running microservice.
+
+For more details about this topic, see:
+
+* https://github.com/netty/netty/issues/11020
+* https://github.com/netty/netty/pull/10848
 
 #### References
 
-* [The blog post](https://thepracticaldeveloper.com/book-update-2.5.5/).
+* [The blog post](https://thepracticaldeveloper.com/book-update-2.6.2/).
 
 Some additional references from the official documentation:
 
-* [Spring Boot 2.5.5 Release Notes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.5-Release-Notes)
+* [Spring Boot 2.6 Release Notes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.6-Release-Notes)
+* [Spring Cloud 2021.0.0 Blog post](https://spring.io/blog/2021/12/02/spring-cloud-2021-0-0-codename-jubilee-has-been-released)
+* [Spring Cloud 2021.0.0 Release Notes](https://github.com/spring-cloud/spring-cloud-release/wiki/Spring-Cloud-2021.0-Release-Notes)
 
 ## Running the app
 
 You can use Docker to start the complete system, and you can also run the services one by one on your computer. [See the book's last chapter repository](https://github.com/Book-Microservices-v2/chapter08d) for the detailed instructions.
-
-I pushed the new images to the public registry, so you can get the system up and running with the new versions using Docker Compose:
-
-```bash
-docker$ docker-compose -f docker-compose-public.yml up
-```
 
 ## Questions
 
@@ -78,3 +92,4 @@ Extra chapters:
 * [E.1. End-to-End Microservice tests with Cucumber](https://github.com/Book-Microservices-v2/cucumber-tests)
 * [U.2.4.0. Upgrade: Spring Boot 2.4.0 and more](https://thepracticaldeveloper.com/book-update-2.4.0/)
 * [U.2.5.5. Upgrade: Spring Boot 2.5.5 and more](https://thepracticaldeveloper.com/book-update-2.5.5/)
+* [U.2.6.2. Upgrade: Spring Boot 2.6.2 and more](https://thepracticaldeveloper.com/book-update-2.6.2/)
