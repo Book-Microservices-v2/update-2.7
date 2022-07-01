@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: gateway
+  config:
+    import: "optional:consul:"
   cloud:
     loadbalancer:
       ribbon:
@@ -14,6 +16,12 @@ spring:
       discovery:
         # Get only services that are passing the health check
         query-passing: true
+      # From the legacy bootstrap.yml
+      config:
+        data-key: application.yml
+        prefix: config
+        format: yaml
+        default-context: defaults
     gateway:
       routes:
         - id: multiplication
@@ -43,3 +51,8 @@ spring:
 #logging:
 #  level:
 #    org.springframework.cloud.gateway.handler.predicate: trace
+
+# From the legacy bootstrap.yml
+logging:
+  level:
+    org.springframework.amqp.rabbit.connection.CachingConnectionFactory: WARN
