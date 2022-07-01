@@ -68,23 +68,13 @@ To remove this error for good, I added the native DNS dependency for my local se
 </dependency>
 ```
 
-### Changes - migrating from Spring Boot 2.6 to 2.7
+## References
 
-There are no additional changes needed in our codebase for this update apart from the version updates:
-
-* All poms changed from 2.5.5 to 2.6.2
-* Spring Cloud version now points to 2021.0.0
-* Docker-compose file also points to the new generated images
-
-#### References
-
-* [The blog post](https://thepracticaldeveloper.com/book-update-2.6.2/).
+* [The blog post](https://thepracticaldeveloper.com/book-update-2.7.1/).
 
 Some additional references from the official documentation:
 
-* [Spring Boot 2.6 Release Notes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.6-Release-Notes)
-* [Spring Cloud 2021.0.0 Blog post](https://spring.io/blog/2021/12/02/spring-cloud-2021-0-0-codename-jubilee-has-been-released)
-* [Spring Cloud 2021.0.0 Release Notes](https://github.com/spring-cloud/spring-cloud-release/wiki/Spring-Cloud-2021.0-Release-Notes)
+* [Spring Boot 2.7 Release Notes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.7-Release-Notes)
 
 ## Running the app
 
