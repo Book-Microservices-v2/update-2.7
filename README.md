@@ -1,6 +1,4 @@
-# Book Extra Chapters - U.2.6: Upgrade to Spring Boot 2.6.2, Spring Cloud 2021.0, and JDK 17
-
-Good news! The book contents are still good and everything in there applies to the newest releases. If you don't have it yet, [get it now!](https://amzn.to/3nADn4q)
+# Book Extra Chapters - U.2.7: Upgrade to Spring Boot 2.7.1
 
 This repository contains the source code of the practical use case described in the book [Learn Microservices with Spring Boot (2nd Edition)](https://amzn.to/3nADn4q).
 
@@ -8,46 +6,75 @@ If you want to know more details about the book and its extra chapters, make sur
 
 The book follows a pragmatic approach to building a Microservice Architecture, using a reference implementation that evolves from a small monolith to a full microservice system. 
 
-## Upgrade - Spring Boot 2.6.2, JDK 17
+## Upgrade - Spring Boot 2.7
 
-This extra chapter brings the project dependencies to the latest Spring Boot, Spring Cloud, and Java versions. 
+This extra chapter brings the project dependencies to the Spring Boot 2.7.1 version.
 
-All these changes are described in detail in a [blog post](https://thepracticaldeveloper.com/book-update-2.6.2/) at The Practical Developer's website. Visit [https://thepracticaldeveloper.com/book-update-2.6.2/](https://thepracticaldeveloper.com/book-update-2.6.2/)
+All these changes are described in detail in a [blog post](https://thepracticaldeveloper.com/book-update-2.7.1/) at The Practical Developer's website. Visit [https://thepracticaldeveloper.com/book-update-2.7.1/](https://thepracticaldeveloper.com/book-update-2.7.1/)
 
-### Changes - migrating from Spring Boot 2.5.5 to 2.6.2
+### Major H2 upgrade with Spring Boot 2.7
 
-There are no additional changes needed in our codebase for this update apart from the version updates:
+The Spring Boot 2.7 release has upgraded H2 to a new major version, 2.x. Many changes are backwards incompatible and two of them break our code.
 
-* All poms changed from 2.5.5 to 2.6.2
-* Spring Cloud version now points to 2021.0.0
-* Docker-compose file also points to the new generated images
+#### Feature not supported: "AUTO_SERVER=TRUE && DB_CLOSE_ON_EXIT=FALSE"
 
-#### Gateway: a minor remark
+These two features can't be used together anymore. See the [blog post](https://thepracticaldeveloper.com/book-update-2.7.1/) for more details.
 
-After this update, I see a long stacktrace in the Gateway with a message as follows:
+Solved by removing the `DB_CLOSE_ON_EXIT` parameter from the connection URL.
+
+#### Error executing DDL "create table user ..."
+
+More detailed error:
 
 ```java
-i.n.r.d.DnsServerAddressStreamProviders  : Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS.
-...        
-Caused by: java.lang.UnsatisfiedLinkError: 'io.netty.resolver.dns.macos.DnsResolver[] io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider.resolvers()'
+Caused by: org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table [*]user (id bigint not null, alias varchar(255), primary key (id))"; expected "identifier"; SQL statement: [...]
 ```
 
-This is only relevant if you're running the project in MacOS. It seems this has been always there but its logging level was promoted and now we see it in the console. It doesn't have any impact on the running microservice.
+Reason: `user` is now a keyword, so it conflicts with the table name.
+Fix (one of the possibilities): Add `NON_KEYWORDS=USER;` to the connection URL for the multiplication microservice's database.
 
-For more details about this topic, see:
+See the [blog post](https://thepracticaldeveloper.com/book-update-2.7.1/) for a complete explanation.
 
-* https://github.com/netty/netty/issues/11020
-* https://github.com/netty/netty/pull/10848
+## New configuration approach (changed in 2.4)
 
-#### References
+In addition to the mandatory upgrades to make the code work with 2.7, I also switched to the new configuration approach introduced by Spring Boot 2.4.x.
 
-* [The blog post](https://thepracticaldeveloper.com/book-update-2.6.2/).
+Required changes to move to the new configuration approach in 2.4:
+
+* Remove the legacy bootstrap starter (if previously added, in my case it was)
+* Remove the `bootstrap.properties` or `bootstrap.yml` and move all those properties to the `application.properties` or `application.yml`.
+* For Spring Cloud Consul to work fine, add a `spring.config.import=consul:` property (or the YAML equivalent) to the projects using Consul.
+* We can remove all the `test.properties` files and the `@TestPropertySource` annotation pointing to it that we needed to add for backwards compatibility with the bootstrap legacy mode.
+
+All the details [here](https://thepracticaldeveloper.com/book-update-2.7.1/)
+
+## Bonus: using an H2 server instead of an auto-server
+
+This version also includes an H2 server Docker image so the microservices can use H2 as an isolated database server instead of using the shared database files offered by the `AUTO_SERVER` mode.
+
+Check the [blog post](https://thepracticaldeveloper.com/book-update-2.7.1/) for the instructions.
+
+## Bonus: remove the ugly error related to MacOS DNS resolver for Netty
+
+To remove this error for good, I added the native DNS dependency for my local setup. This applies to the `gateway` service's `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>io.netty</groupId>
+    <artifactId>netty-resolver-dns-native-macos</artifactId>
+    <!-- Change this if your Mac is not M1, see e.g. https://stackoverflow.com/questions/65954571/spring-boot-2-4-2-dns-resolution-problem-at-start-on-apple-m1 -->
+    <classifier>osx-aarch_64</classifier>
+    <version>4.1.78.Final</version>
+</dependency>
+```
+
+## References
+
+* [The blog post](https://thepracticaldeveloper.com/book-update-2.7.1/).
 
 Some additional references from the official documentation:
 
-* [Spring Boot 2.6 Release Notes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.6-Release-Notes)
-* [Spring Cloud 2021.0.0 Blog post](https://spring.io/blog/2021/12/02/spring-cloud-2021-0-0-codename-jubilee-has-been-released)
-* [Spring Cloud 2021.0.0 Release Notes](https://github.com/spring-cloud/spring-cloud-release/wiki/Spring-Cloud-2021.0-Release-Notes)
+* [Spring Boot 2.7 Release Notes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.7-Release-Notes)
 
 ## Running the app
 
@@ -72,7 +99,6 @@ Are you interested in building a microservice architecture from scratch? You'll 
 You can **buy the book online** from these stores:
 
 * [Amazon](https://amzn.to/3nADn4q)
-* [Apress](https://www.kqzyfj.com/click-8535631-14029332?url=https%3A%2F%2Fwww.apress.com%2Fgp%2Fbook%2F9781484261309)
 * and other online stores, check the IBAN (9781484261309) on [google](https://www.google.com/search?q=9781484261309)
 
 ### Source code by chapter (all repositories are available on Github)
@@ -93,3 +119,4 @@ Extra chapters:
 * [U.2.4.0. Upgrade: Spring Boot 2.4.0 and more](https://thepracticaldeveloper.com/book-update-2.4.0/)
 * [U.2.5.5. Upgrade: Spring Boot 2.5.5 and more](https://thepracticaldeveloper.com/book-update-2.5.5/)
 * [U.2.6.2. Upgrade: Spring Boot 2.6.2 and more](https://thepracticaldeveloper.com/book-update-2.6.2/)
+* [U.2.7.1. Upgrade: Spring Boot 2.7.1 and more](https://thepracticaldeveloper.com/book-update-2.7.1/)

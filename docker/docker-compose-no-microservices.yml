@@ -18,6 +18,14 @@ services:
       - '15672:15672'
     networks:
       - microservices
+  h2-server-dev:
+    image: h2-server:2.1.214
+    container_name: h2-server
+    ports:
+      - '81:81'
+      - '1521:1521'
+    networks:
+      - microservices
 
 networks:
   microservices:
