@@ -1,0 +1,7 @@
+spring:
+  rabbitmq:
+    host: rabbitmq
+  cloud:
+    consul:
+      discovery:
+        instance-id: ${spring.application.name}-${random.int(1000)}

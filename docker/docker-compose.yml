@@ -6,27 +6,29 @@ services:
     ports:
       - '3000:80'
   multiplication:
-    image: multiplication:2.6.2-SNAPSHOT
+    image: multiplication:2.7.1-SNAPSHOT
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_DATASOURCE_URL=jdbc:h2:tcp://h2-server:1521/home/h2-data/multiplication;NON_KEYWORDS=USER;
     depends_on:
       - rabbitmq-dev
       - consul-importer
     networks:
       - microservices
   gamification:
-    image: gamification:2.6.2-SNAPSHOT
+    image: gamification:2.7.1-SNAPSHOT
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_DATASOURCE_URL=jdbc:h2:tcp://h2-server:1521/home/h2-data/gamification
     depends_on:
       - rabbitmq-dev
       - consul-importer
     networks:
       - microservices
   gateway:
-    image: gateway:2.6.2-SNAPSHOT
+    image: gateway:2.7.1-SNAPSHOT
     ports:
       - '8000:8000'
     environment:
@@ -38,7 +40,7 @@ services:
     networks:
       - microservices
   logs:
-    image: logs:2.6.2-SNAPSHOT
+    image: logs:2.7.1-SNAPSHOT
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_CLOUD_CONSUL_HOST=consul
@@ -68,6 +70,14 @@ services:
     ports:
       - '5672:5672'
       - '15672:15672'
+    networks:
+      - microservices
+  h2-server-dev:
+    image: h2-server:2.1.214
+    container_name: h2-server
+    ports:
+      - '81:81'
+      - '1521:1521'
     networks:
       - microservices
 
